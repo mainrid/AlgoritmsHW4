@@ -9,6 +9,8 @@ public class Quaternion {
 	private double j;
 	private double k;
 
+	public static double acc = 0.000000000000001;
+
 	/**
 	 * Constructor from four double values.
 	 * 
@@ -73,7 +75,7 @@ public class Quaternion {
 	 */
 	@Override
 	public String toString() {
-		return real + "+" + i + "i+" + j + "j+" + k + "k";
+		return this.real + "+" + this.i + "i+" + this.j + "j+" + this.k + "k";
 	}
 
 	/**
@@ -88,8 +90,27 @@ public class Quaternion {
 	 * @return a quaternion represented by string s
 	 */
 	public static Quaternion valueOf(String s) {
-		//String[] splitted = s.split("[+]");
-		return null;
+		// String[] splitted = s.split("[+]");
+		String[] splitted = s.split("[+]");
+		if (splitted.length == 4 && splitted[1].contains("i") && splitted[2].contains("j")
+				&& splitted[3].contains("k")) {
+			try {
+				double real = Double.valueOf(splitted[0]);
+				double i = Double.valueOf(splitted[1].substring(0, splitted[1].length() - 1));
+				double j = Double.valueOf(splitted[2].substring(0, splitted[2].length() - 1));
+				double k = Double.valueOf(splitted[3].substring(0, splitted[3].length() - 1));
+
+				return new Quaternion(real, i, j, k);
+
+			} catch (NumberFormatException e) {
+				throw new IllegalArgumentException("Method \"valueOf\" argument: " + s
+						+ " is not in the correct format. Correct method call example: Quaternion.valueOf(\"5+3i+2j+5k\")");
+			}
+
+		} else {
+			throw new IllegalArgumentException("Method \"valueOf\" argument: " + s
+					+ " is not in the correct format. Correct method call example: Quaternion.valueOf(\"5+3i+2j+5k\")");
+		}
 	}
 
 	/**
@@ -98,7 +119,7 @@ public class Quaternion {
 	 * @return independent clone of <code>this</code>
 	 */
 	@Override
-	public Object clone() throws CloneNotSupportedException {		
+	public Object clone() throws CloneNotSupportedException {
 		return new Quaternion(this.real, this.i, this.j, this.k);
 	}
 
@@ -129,7 +150,7 @@ public class Quaternion {
 	 * @return quaternion <code>-this</code>
 	 */
 	public Quaternion opposite() {
-		return new Quaternion(-this.real, -this.i, -this.j, -this.k); 
+		return new Quaternion(-this.real, -this.i, -this.j, -this.k);
 	}
 
 	/**
@@ -141,7 +162,12 @@ public class Quaternion {
 	 * @return quaternion <code>this+q</code>
 	 */
 	public Quaternion plus(Quaternion q) {
-		return null; // TODO!!!
+		double realSum = this.getRpart() + q.getRpart();
+		double iSum = this.getIpart() + q.getIpart();
+		double jSum = this.getJpart() + q.getJpart();
+		double kSum = this.getKpart() + q.getKpart();
+
+		return new Quaternion(realSum, iSum, jSum, kSum);
 	}
 
 	/**
@@ -165,7 +191,7 @@ public class Quaternion {
 	 * @return quaternion <code>this*r</code>
 	 */
 	public Quaternion times(double r) {
-		return null; // TODO!!!
+		return new Quaternion(this.real * r, this.i * r, this.j * r, this.k * r);
 	}
 
 	/**
@@ -187,7 +213,7 @@ public class Quaternion {
 	 * @return quaternion <code>this-q</code>
 	 */
 	public Quaternion minus(Quaternion q) {
-		return null; // TODO!!!
+		return this.plus(q.opposite()); 
 	}
 
 	/**
@@ -199,7 +225,7 @@ public class Quaternion {
 	 * @return quaternion <code>this*inverse(q)</code>
 	 */
 	public Quaternion divideByRight(Quaternion q) {
-		return null; // TODO!!!
+		return this.times(q.opposite());
 	}
 
 	/**
@@ -210,7 +236,7 @@ public class Quaternion {
 	 * @return quaternion <code>inverse(q)*this</code>
 	 */
 	public Quaternion divideByLeft(Quaternion q) {
-		return null; // TODO!!!
+		return q.opposite().times(this); // TODO!!!
 	}
 
 	/**
@@ -223,7 +249,18 @@ public class Quaternion {
 	 */
 	@Override
 	public boolean equals(Object qo) {
-		return false; // TODO!!!
+		if (!(qo instanceof Quaternion)) {
+			return false;
+		}
+		Quaternion comparable = (Quaternion) qo;
+		if (Math.abs(this.real - comparable.getRpart()) < Quaternion.acc
+				&& Math.abs(this.i - comparable.getIpart()) < Quaternion.acc
+				&& Math.abs(this.j - comparable.getJpart()) < Quaternion.acc
+				&& Math.abs(this.k - comparable.getKpart()) < Quaternion.acc) {
+
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -244,7 +281,7 @@ public class Quaternion {
 	 */
 	@Override
 	public int hashCode() {
-		return 0; // TODO!!!
+		return new Double(this.real + this.i + this.j + this.k).hashCode(); //
 	}
 
 	/**
