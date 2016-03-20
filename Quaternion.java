@@ -9,7 +9,7 @@ public class Quaternion {
 	private double j;
 	private double k;
 
-	public static double acc = 0.000000000000001;
+	public static double acc = 0.0000000000001;
 
 	/**
 	 * Constructor from four double values.
@@ -130,7 +130,11 @@ public class Quaternion {
 	 *         zero
 	 */
 	public boolean isZero() {
-		return false; // TODO!!!
+		if (Math.abs(this.real) < Quaternion.acc && Math.abs(this.i) < Quaternion.acc
+				&& Math.abs(this.j) < Quaternion.acc && Math.abs(this.k) < Quaternion.acc) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -180,7 +184,15 @@ public class Quaternion {
 	 * @return quaternion <code>this*q</code>
 	 */
 	public Quaternion times(Quaternion q) {
-		return null; // TODO!!!
+		double real = (this.getRpart() * q.getRpart() - this.getIpart() * q.getIpart() - this.getJpart() * q.getJpart()
+				- this.getKpart() * q.getKpart());
+		double i = (this.getRpart() * q.getIpart() + this.getIpart() * q.getRpart() + this.getJpart() * q.getKpart()
+				- this.getKpart() * q.getJpart());
+		double j = (this.getRpart() * q.getJpart() - this.getIpart() * q.getKpart() + this.getJpart() * q.getRpart()
+				+ this.getKpart() * q.getIpart());
+		double k = (this.getRpart() * q.getKpart() + this.getIpart() * q.getJpart() - this.getJpart() * q.getIpart()
+				+ this.getKpart() * q.getRpart());
+		return new Quaternion(real, i, j, k);
 	}
 
 	/**
@@ -202,7 +214,18 @@ public class Quaternion {
 	 * @return quaternion <code>1/this</code>
 	 */
 	public Quaternion inverse() {
-		return null; // TODO!!!
+		if (this.isZero()) {
+			throw new RuntimeException("Quaternion is zero, dividing by 0 is now allowed ");
+		}
+		double real = this.getRpart() / (this.getRpart() * this.getRpart() + this.getIpart() * this.getIpart()
+				+ this.getJpart() * this.getJpart() + this.getKpart() * this.getKpart());
+		double i = (-this.getIpart()) / (this.getRpart() * this.getRpart() + this.getIpart() * this.getIpart()
+				+ this.getJpart() * this.getJpart() + this.getKpart() * this.getKpart());
+		double j = (-this.getJpart()) / (this.getRpart() * this.getRpart() + this.getIpart() * this.getIpart()
+				+ this.getJpart() * this.getJpart() + this.getKpart() * this.getKpart());
+		double k = (-this.getKpart()) / (this.getRpart() * this.getRpart() + this.getIpart() * this.getIpart()
+				+ this.getJpart() * this.getJpart() + this.getKpart() * this.getKpart());
+		return new Quaternion(real, i, j, k);
 	}
 
 	/**
@@ -213,7 +236,7 @@ public class Quaternion {
 	 * @return quaternion <code>this-q</code>
 	 */
 	public Quaternion minus(Quaternion q) {
-		return this.plus(q.opposite()); 
+		return this.plus(q.opposite());
 	}
 
 	/**
@@ -225,7 +248,7 @@ public class Quaternion {
 	 * @return quaternion <code>this*inverse(q)</code>
 	 */
 	public Quaternion divideByRight(Quaternion q) {
-		return this.times(q.opposite());
+		return this.times(q.inverse());
 	}
 
 	/**
@@ -236,7 +259,7 @@ public class Quaternion {
 	 * @return quaternion <code>inverse(q)*this</code>
 	 */
 	public Quaternion divideByLeft(Quaternion q) {
-		return q.opposite().times(this); // TODO!!!
+		return q.inverse().times(this); // TODO!!!
 	}
 
 	/**
@@ -271,7 +294,8 @@ public class Quaternion {
 	 * @return dot product of this and q
 	 */
 	public Quaternion dotMult(Quaternion q) {
-		return null; // TODO!!!
+		Quaternion quat = (this.times(q.conjugate()).plus(q.times(this.conjugate()))).times(0.5);
+		return quat;
 	}
 
 	/**
@@ -291,7 +315,9 @@ public class Quaternion {
 	 * @return norm of <code>this</code> (norm is a real number)
 	 */
 	public double norm() {
-		return 0.; // TODO!!!
+		double n = Math.sqrt(this.getRpart() * this.getRpart() + this.getIpart() * this.getIpart()
+				+ this.getJpart() * this.getJpart() + this.getKpart() * this.getKpart());
+		return n;
 	}
 
 	/**
