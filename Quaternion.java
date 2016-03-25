@@ -9,7 +9,7 @@ public class Quaternion {
 	private double j;
 	private double k;
 
-	public static double acc = 0.0000000000001;
+	public static final double ACC = 0.0000000000001;
 
 	/**
 	 * Constructor from four double values.
@@ -130,8 +130,8 @@ public class Quaternion {
 	 *         zero
 	 */
 	public boolean isZero() {
-		if (Math.abs(this.real) < Quaternion.acc && Math.abs(this.i) < Quaternion.acc
-				&& Math.abs(this.j) < Quaternion.acc && Math.abs(this.k) < Quaternion.acc) {
+		if (Math.abs(this.real) < Quaternion.ACC && Math.abs(this.i) < Quaternion.ACC
+				&& Math.abs(this.j) < Quaternion.ACC && Math.abs(this.k) < Quaternion.ACC) {
 			return true;
 		}
 		return false;
@@ -248,7 +248,12 @@ public class Quaternion {
 	 * @return quaternion <code>this*inverse(q)</code>
 	 */
 	public Quaternion divideByRight(Quaternion q) {
-		return this.times(q.inverse());
+		try {
+			return this.times(q.inverse());
+		} catch (RuntimeException e) {
+			throw new RuntimeException(q + " quaternion is zero, dividing by 0 is now allowed ");
+		}
+		
 	}
 
 	/**
@@ -258,8 +263,12 @@ public class Quaternion {
 	 *            (left) divisor
 	 * @return quaternion <code>inverse(q)*this</code>
 	 */
-	public Quaternion divideByLeft(Quaternion q) {
-		return q.inverse().times(this); // TODO!!!
+	public Quaternion divideByLeft(Quaternion q) {		
+		try {
+			return q.inverse().times(this); 
+		} catch (RuntimeException e) {
+			throw new RuntimeException(q + " quaternion is zero, dividing by 0 is now allowed ");
+		}
 	}
 
 	/**
@@ -276,10 +285,10 @@ public class Quaternion {
 			return false;
 		}
 		Quaternion comparable = (Quaternion) qo;
-		if (Math.abs(this.real - comparable.getRpart()) < Quaternion.acc
-				&& Math.abs(this.i - comparable.getIpart()) < Quaternion.acc
-				&& Math.abs(this.j - comparable.getJpart()) < Quaternion.acc
-				&& Math.abs(this.k - comparable.getKpart()) < Quaternion.acc) {
+		if (Math.abs(this.real - comparable.getRpart()) < Quaternion.ACC
+				&& Math.abs(this.i - comparable.getIpart()) < Quaternion.ACC
+				&& Math.abs(this.j - comparable.getJpart()) < Quaternion.ACC
+				&& Math.abs(this.k - comparable.getKpart()) < Quaternion.ACC) {
 
 			return true;
 		}
@@ -305,7 +314,7 @@ public class Quaternion {
 	 */
 	@Override
 	public int hashCode() {
-		return new Double(this.real + this.i + this.j + this.k).hashCode(); //
+		return new Double(this.real*101).hashCode() + new Double(this.i*139).hashCode() + new Double(this.j*199).hashCode() + new Double(this.k*71).hashCode(); //
 	}
 
 	/**
